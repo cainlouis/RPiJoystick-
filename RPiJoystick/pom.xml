@@ -15,6 +15,11 @@
             <artifactId>javafx-controls</artifactId>
             <version>16</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>16-ea+7</version>
+        </dependency>
         <!--  TilesFX library -->
         <dependency>
             <groupId>eu.hansolo</groupId>

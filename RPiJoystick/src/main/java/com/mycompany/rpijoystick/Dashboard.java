@@ -23,14 +23,21 @@ import javafx.scene.paint.Color;
  * @author Nael Louis <your.name at your.org>
  */
 public class Dashboard extends HBox {
+    //Flag to monitor the threads
+    private static boolean running = true;
+    
     //Constructor
     public Dashboard() throws IOException {
+        //Start the thread
+        this.startProcess();
+        
+        //Build the screen
         this.buildScreen();
     }
     
     private void buildScreen() throws IOException {
-        //var local = new Local("en", "CA");
-        
+                /*Tile for the clock*/
+            
         //Tile for clock 
         var clockTile = TileBuilder.create()
                 .skinType(SkinType.CLOCK)
@@ -151,6 +158,22 @@ public class Dashboard extends HBox {
     }
     
     private void endApplication() {
+        this.running = false;
         Platform.exit();
+    }
+    
+    private void startProcess() {
+        Thread process = new Thread(() -> {
+            while(running) {
+                
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        
+                    }
+                });
+            }
+        });
+        process.start();
     }
 }
