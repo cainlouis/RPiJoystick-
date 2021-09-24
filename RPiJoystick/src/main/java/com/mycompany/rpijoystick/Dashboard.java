@@ -5,7 +5,9 @@ import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.Tile.ImageMask;
 import eu.hansolo.tilesfx.Tile.TextSize;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.Locale;
 import javafx.scene.layout.HBox;
@@ -25,12 +27,19 @@ import javafx.scene.paint.Color;
 public class Dashboard extends HBox {
     //Flag to monitor the threads
     private static boolean running = true;
+    private String cmd = "./Joystick";
+    private String output;
+    private ProcessBuilder pb;
+    private String[] vals; 
+    private TextArea xAxis;
+    private TextArea yAxis;
+    private TextArea zAxis;
     
     //Constructor
     public Dashboard() throws IOException {
         //Start the thread
-        this.startProcess();
-        
+        this.startJavaThread();
+        this.startJavafxThread();
         //Build the screen
         this.buildScreen();
     }
@@ -95,7 +104,7 @@ public class Dashboard extends HBox {
                     
                 /*TextArea tile for X axis and timestamp */
             
-        TextArea xAxis = new TextArea();
+        xAxis = new TextArea();
         xAxis.setEditable(false);
         
         //layout of the textArea
@@ -111,7 +120,7 @@ public class Dashboard extends HBox {
         
                 /*TextArea tile for Y axis and timestamp */
         
-        TextArea yAxis = new TextArea();
+        yAxis = new TextArea();
         yAxis.setEditable(false);
         
         //layout of the textArea
@@ -127,7 +136,7 @@ public class Dashboard extends HBox {
         
                 /*TextArea tile for Z axis and timestamp */
         
-        TextArea zAxis = new TextArea();
+        zAxis = new TextArea();
         zAxis.setEditable(false);
         
         //layout of the textArea
@@ -162,18 +171,48 @@ public class Dashboard extends HBox {
         Platform.exit();
     }
     
-    private void startProcess() {
-        Thread process = new Thread(() -> {
-            while(running) {
+    private void startJavaThread() {
+        Thread javaThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    pb = new ProcessBuilder(cmd);
+                    var processStart = pb.getProcessBuilder().start();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(processStart.getInputStream()));
+                    while(running) {
+                        String line = reader.readLine();
+                        line = line.replaceAll("\\s+", "");
+                        vals = line.split(",", 3);
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        javaThread.start();
+    }
+    
+    private void startJavafxThread() {
+        Thread guiThread = new Thread(() -> {
+            while (running) {
+                try {
+                    //Delay 5 seconds
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                    System.err.println("exampleThread thread got interrupted");
+                }
                 
+                //Needed to be to update an active node
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        
+                        xAxis.setText(vals[0]);
+                        yAxis.setText(vals[1]);
+                        zAxis.setText(vals[2]);
                     }
                 });
             }
         });
-        process.start();
+        guiThread.start();
     }
 }

@@ -50,13 +50,13 @@ public class ProcessBuilder {
         try (var reader = new BufferedReader(
             new InputStreamReader(process.getInputStream()))) {
 
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                this.theOutput = this.theOutput + line;
-            }
-
+            String line = reader.readLine();
+            this.theOutput = line;
         }
         return this.theOutput;
+    }
+    
+    public java.lang.ProcessBuilder getProcessBuilder() {
+        return this.processBuilder;
     }
 }
