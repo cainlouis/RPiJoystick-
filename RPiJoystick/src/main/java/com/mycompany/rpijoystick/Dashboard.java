@@ -22,7 +22,7 @@ import javafx.scene.paint.Color;
 
 /**
  *
- * @author Nael Louis <your.name at your.org>
+ * @author Nael Louis 
  */
 public class Dashboard extends HBox {
     //Flag to monitor the threads
@@ -34,8 +34,6 @@ public class Dashboard extends HBox {
     private TextArea xAxis;
     private TextArea yAxis;
     private TextArea zAxis;
-    private Date timestamp;
-    private String choiceValue = "Append output";
     
     //Constructor
     public Dashboard() throws IOException {
@@ -64,9 +62,8 @@ public class Dashboard extends HBox {
         //ChoiceBox and it's values
         ChoiceBox choiceBox = new ChoiceBox();
         
-        choiceBox.getItems().add("Append output");
+        choiceBox.getItems().add("All output in TextArea");
         choiceBox.getItems().add("One output at a time");
-        choiceBox.setValue(choiceValue);
         
         //Label for the choiceBox
         Label options = new Label("Select your choice: ");
@@ -78,7 +75,7 @@ public class Dashboard extends HBox {
         FlowPane fp = new FlowPane(options, cbBox);
         
         choiceBox.setOnAction((event) -> {
-            choiceValue = choiceBox.getValue().toString();
+            //to do:
         });
         
         var choiceTile = TileBuilder.create()
@@ -184,7 +181,6 @@ public class Dashboard extends HBox {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(processStart.getInputStream()));
                     while(running) {
                         String line = reader.readLine();
-                        timestamp = new Date();
                         line = line.replaceAll("\\s+", "");
                         vals = line.split(",", 3);
                     }
@@ -210,15 +206,9 @@ public class Dashboard extends HBox {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        if (choiceValue.equals("Append output")){
-                            xAxis.appendText(vals[0] + "\n" + "Timestamp: " + timestamp + "\n");
-                            yAxis.appendText(vals[1] + "\n" + "Timestamp: " + timestamp + "\n");
-                            zAxis.appendText(vals[2] + "\n" + "Timestamp: " + timestamp + "\n");
-                        } else {
-                            xAxis.setText(vals[0] + "\n" + "Timestamp: " + timestamp);
-                            yAxis.setText(vals[1] + "\n" + "Timestamp: " + timestamp);
-                            zAxis.setText(vals[2] + "\n" + "Timestamp: " + timestamp);
-                        }
+                        xAxis.setText(vals[0]);
+                        yAxis.setText(vals[1]);
+                        zAxis.setText(vals[2]);
                     }
                 });
             }

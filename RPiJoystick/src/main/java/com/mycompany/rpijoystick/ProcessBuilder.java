@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  *
- * @author Nael Louis <your.name at your.org>
+ * @author Nael Louis 
  */
 public class ProcessBuilder {
     //Stores the output from the process
