@@ -3,7 +3,6 @@ package com.mycompany.rpijoystick;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.TileBuilder;
-import eu.hansolo.tilesfx.Tile.ImageMask;
 import eu.hansolo.tilesfx.Tile.TextSize;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,6 +33,8 @@ public class Dashboard extends HBox {
     private TextArea xAxis;
     private TextArea yAxis;
     private TextArea zAxis;
+    private String choiceValue = "Append output";
+    private Date timestamp;
     
     //Constructor
     public Dashboard() throws IOException {
@@ -62,8 +63,15 @@ public class Dashboard extends HBox {
         //ChoiceBox and it's values
         ChoiceBox choiceBox = new ChoiceBox();
         
-        choiceBox.getItems().add("All output in TextArea");
+        //Set the values of the choiceBox
+        choiceBox.getItems().add("Append output");
         choiceBox.getItems().add("One output at a time");
+        //set the default value
+        choiceBox.setValue(choiceValue);
+        //set on action
+        choiceBox.setOnAction((event) -> {
+            choiceValue = choiceBox.getValue().toString();
+        });
         
         //Label for the choiceBox
         Label options = new Label("Select your choice: ");
@@ -73,10 +81,6 @@ public class Dashboard extends HBox {
         HBox cbBox = new HBox(choiceBox);
         
         FlowPane fp = new FlowPane(options, cbBox);
-        
-        choiceBox.setOnAction((event) -> {
-            //to do:
-        });
         
         var choiceTile = TileBuilder.create()
                 .skinType(SkinType.CUSTOM)
@@ -176,11 +180,17 @@ public class Dashboard extends HBox {
             @Override
             public void run() {
                 try {
+                    //create the processBuilder and start the java.lang.processBuilder
                     pb = new ProcessBuilder(cmd);
                     var processStart = pb.getProcessBuilder().start();
+                    //Use the reader to get the output of the c++ file
                     BufferedReader reader = new BufferedReader(new InputStreamReader(processStart.getInputStream()));
                     while(running) {
+                        //get the line from the reader
                         String line = reader.readLine();
+                        //get the date 
+                        timestamp = new Date();
+                        //parse the output so it works with the textAreas
                         line = line.replaceAll("\\s+", "");
                         vals = line.split(",", 3);
                     }
@@ -206,9 +216,16 @@ public class Dashboard extends HBox {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        xAxis.setText(vals[0]);
-                        yAxis.setText(vals[1]);
-                        zAxis.setText(vals[2]);
+                        //append output in the textareas if choice is to append it
+                        if (choiceValue.equals("Append output")) {
+                            xAxis.appendText(vals[0] + "\n" + "Timestamp: " + timestamp + "\n");
+                            yAxis.appendText(vals[1] + "\n" + "Timestamp: " + timestamp + "\n");
+                            zAxis.appendText(vals[2] + "\n" + "Timestamp: " + timestamp + "\n");
+                        } else { //else just replace the text for the new output
+                            xAxis.setText(vals[0] + "\n" + "Timestamp: " + timestamp);
+                            yAxis.setText(vals[1] + "\n" + "Timestamp: " + timestamp);
+                            zAxis.setText(vals[2] + "\n" + "Timestamp: " + timestamp);
+                        }
                     }
                 });
             }

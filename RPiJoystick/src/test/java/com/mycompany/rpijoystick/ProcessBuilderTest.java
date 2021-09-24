@@ -11,6 +11,7 @@ public class ProcessBuilderTest {
     
     public ProcessBuilder processInstance;
     
+    //create the instance for the test
     public ProcessBuilderTest() {
         String theCmd = "./Joystick";
         processInstance = new ProcessBuilder(theCmd);
@@ -25,6 +26,4 @@ public class ProcessBuilderTest {
         java.lang.ProcessBuilder result = processInstance.getProcessBuilder();
         assertNotNull(result);
     }
-    
 }
-    
